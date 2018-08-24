@@ -1,0 +1,84 @@
+{% extends "index.html" %}
+{% block content-container %}
+    <div id="page-title">
+        <h1 class="page-header text-overflow">日志系统</h1>
+        <!--Searchbox-->
+        <div class="searchbox">
+            <div class="input-group custom-search-form">
+                <input type="text" class="form-control" placeholder="Search..">
+                <span class="input-group-btn">
+                    <button class="text-muted" type="button"><i class="pli-magnifi-glass"></i></button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="page-content">
+
+        <div id="page-body-right" class="panel col-lg">
+            <div class="panel-heading">
+                <h3 class="panel-title">日志列表</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <section class="content">
+                    <table id="log_table" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>用户名</th>
+                            <th>日志类型</th>
+                            <th>日志详细</th>
+                            <th>记录时间</th>
+                        </tr>
+                        </thead>
+                        <tbody id="loglist">
+                        {% for log in logs %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ log.user.username }}</td>
+                                <td>{{ log.get_log_type_display }}</td>
+                                <td ><pre style="width:1100px;">{{ log.content }}</pre></td>
+                                <td>{{ log.c_time }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>没有日志</tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    </section>
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="/statics/js/jquery.dataTables.min.js"></script>
+    <script src="/statics/js/dataTables.bootstrap.js"></script>
+    <link href="/statics/css/dataTables.bootstrap.css" rel="stylesheet" type="text/css"/>
+{#    <link href="/statics/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css"/>#}
+
+    <script>
+
+        $("#disconnect").hide();
+
+        $("#page-body").hide();
+
+        $(function () {
+            $("#log_table").DataTable({
+                "paging":true,          <!-- 允许分页 -->
+                "lengthChange":true,    <!-- 允许改变每页显示的行数 -->
+                "searching":true,       <!-- 允许内容搜索 -->
+                "ordering":true,        <!-- 允许排序 -->
+                "info":true,            <!-- 显示信息 -->
+                "autoWidth":true
+                    });
+        });
+
+    </script>
+
+{% endblock %}

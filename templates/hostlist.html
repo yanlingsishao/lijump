@@ -1,0 +1,311 @@
+{% extends "index.html" %}
+{% block content-container %}
+
+    <div id="page-title">
+        <h1 class="page-header text-overflow">主机列表</h1>
+        <!--Searchbox-->
+        <div class="searchbox">
+            <div class="input-group custom-search-form">
+                <input type="text" class="form-control" placeholder="Search..">
+                <span class="input-group-btn">
+                    <button class="text-muted" type="button"><i class="pli-magnifi-glass"></i></button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <ol class="breadcrumb">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Library</a></li>
+        <li class="active">主机列表</li>
+    </ol>
+
+    <div id="page-content">
+        <div id="page-body-left" class="panel col-lg-3">
+            <div class="panel-heading">
+                <h3 class="panel-title">主机组</h3>
+            </div>
+            <div class="panel-body">
+                <ul class="list-group">
+                    {% for group in request.user.account.host_groups.all %}
+                        <li class="list-group-item" id="connectother" onclick="GetHostlist({{ group.id }},this)"><span
+                                class="badge badge-success">{{ group.host_user_binds.count }}</span>{{ group.name }}
+                        </li>
+                    {% endfor %}
+                    <li class="list-group-item" id="connectother" onclick="GetHostlist(-1,this)">
+                        <span class="badge badge-success">{{ request.user.account.host_user_binds.count }}</span>未分组主机
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="page-body-right" class="panel col-lg-9">
+            <div class="panel-heading">
+                <h3 class="panel-title">主机列表</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table id="host_table" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Hostname</th>
+                            <th>IP</th>
+                            <th>IDC</th>
+                            <th>Port</th>
+                            <th>Username</th>
+                            <th>Login</th>
+                            <th>Token</th>
+                        </tr>
+                        </thead>
+                        <tbody id="hostlist">
+
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+        <div id="page-body">
+{#            <div id="disconnect" style="margin-top: 20px">#}
+{#                    <button type="button" class="btn btn-danger">关闭连接</button>#}
+{#            </div>#}
+{#            <div id="term" class="son"></div>#}
+
+
+            <div class="modal fade bs-example-modal-lg" id="ID_ReformDetail" aria-hidden="true" data-backdrop="static" tabindex="-1" role="dialog"  aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                            <span style="font-size: 50px;color: red" class="btn btn-danger" aria-hidden="true">&times;</span>
+                        </button>
+                         <h3>webssh</h3>
+                        <input  type="file" name="upfile" id="upfile"/>
+                        <input  id="uploadfile" type="text" value="/">
+                        <input id="uploadBtn" type="submit" value="开始上传" />
+                    </div>
+
+                    <div class="modal-body" >
+                        <div class="son" id="term"></div>
+                    </div>
+                    <div class="modal-footer">
+{#                        <a href="#" class="btn btn-success">唤醒活动</a>#}
+{#                        <a href="#" class="btn" data-dismiss="modal">关闭</a>#}
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <script src="/statics/js/luffy.js"></script>
+    <script src="/statics/js/xterm.min.js"></script>
+    <link href="/statics/css/xterm.min.css" rel="stylesheet" type="text/css"/>
+    <script>
+        function GetToken(self, bind_host_id) {
+            $.post("{% url 'get_token' %}", {
+                "bind_host_id": bind_host_id,
+                "csrfmiddlewaretoken": "{{ csrf_token }}"
+            }, function (callback) {
+                console.log(callback)
+            })
+        }
+
+        function GetHostlist(gid, self) {
+            $.get("{% url 'get_host_list' %}", {'gid': gid}, function (callback) {
+                var data = JSON.parse(callback);
+                console.log(data);
+
+                var trs = '';
+                $.each(data, function (index, i) {
+                    {#                    var trs = "<tr><td>" + i.host__hostname + "</td><td>" + i.host__ip__addr#}
+                    trs += "<tr><td>";
+                    trs += i.host__hostname + "</td><td>";
+                    trs += i.host__ip_addr + "</td><td>";
+                    trs += i.host__idc__name + "</td><td>";
+                    trs += i.host__port + "</td><td>";
+                    trs += i.host_user__username + "</td><td>";
+                    trs += "<a class='btn btn-info' onclick=GetToken(this,'" + i.id + "')>Token</a>";
+                    trs += "<span >" + i.id + "</span><button id='conn_button' data-toggle='modal' data-target='.bs-example-modal-lg' onclick=Getid(this) type='button' class='btn btn-info' >连接</button>";
+                    trs += "</td></tr>"
+                });
+                $("#hostlist").html(trs);
+            });
+            $(self).addClass("active").siblings().removeClass("active")
+
+        }
+
+
+
+        function openTerminal(options) {
+
+            $('#uploadBtn').click(function () {
+                var form_data = new FormData();
+                var file_info = $("#upfile")[0].files[0];
+                form_data.append("file",file_info);
+                form_data.append("csrfmiddlewaretoken","{{ csrf_token }}");
+                form_data.append("des_id",encodeURIComponent(options.des_id));
+                form_data.append("upload_file", $("#uploadfile").val());
+                $.ajax({
+                    url:"/upload_ajax/",
+                    type:"POST",
+                    data:form_data,
+                    processData:false,
+                    contentType:false,
+                    success: function(callback){
+                        console.log("ok")
+                    }
+                })
+            });
+
+            //创建websocket通道
+            var client = new IronSSHClient();
+            copytext = false;
+            var term = new Terminal(
+                    {
+                        cols: 80,
+                        rows: 24,
+                        handler: function (key) {
+                            console.log(key);
+                            if (copytext){
+                                client.send(copytext);
+                                copytext = false
+                            }
+                            client.send(key);
+
+
+
+                        },
+                        screenKeys: true,
+                        useStyle: true,
+                        cursorBlink: true
+                    });
+            term.open();
+
+            $('.terminal').detach().appendTo('#term');
+
+            term.resize(80,24);
+            term.write("开始连接....");
+
+            $(".close").click(function(){
+                client._connection.close();
+                top.location.reload()
+            });
+
+            client.connect(
+                    $.extend(options, {
+                                onError: function (error) {
+                                    term.write("错误：" + error + "\r\n");
+                                },
+                                onConnect: function () {
+                                    term.write('\r');
+                                },
+                                onClose: function () {
+                                    term.write("对方断开了连接......");
+                                }, //term.destroy()
+                                onData: function (data) {
+
+                                    if (copytext){
+                                        term.write(copytext);
+                                        copytext = false
+                                    }
+                                    else {
+                                        term.write(data)
+                                    }
+                                }
+                            }
+                    )
+            );
+
+
+
+
+        }
+
+{#        $("#disconnect").hide();#}
+
+{#        $("#page-body").hide();#}
+
+        function Getid(self) {
+
+            //初始化情况下，关闭连接的按钮是隐藏的
+
+{#            $("#page-body-left").hide();#}
+{#            $("#page-body-right").hide();#}
+{#            $("#page-body").show();#}
+{#            $("#disconnect button").click(function () {#}
+{#                $("#term").empty();#}
+{#                $("div.table-responsive").show();#}
+{#                $("#page-body").hide();#}
+{#                $("#page-body-left").show();#}
+{#                $("#page-body-right").show();#}
+{##}
+{#            });#}
+{#            $("#disconnect").show();#}
+
+            var des_id = $(self).parent().children().first().next().text();
+
+            var options = {
+                des_id: des_id
+            };
+            //打开web模拟ssh终端
+            openTerminal(options);
+
+        }
+
+
+    </script>
+    <style>
+        .modal-dialog{
+            min-width: 1100px;
+        }
+
+        .modal-header h3{
+            text-align: center;
+            color: #00af00;
+        }
+
+
+
+        .terminal{
+            overflow:scroll;
+            border: #000 solid 5px;
+            margin: auto;
+            font-family: "Monaco", "DejaVu Sans Mono", "Liberation Mono", monospace;
+            font-size: 18px;
+            color: #f0f0f0;
+            background: #000;
+            width: 1000px;
+            box-shadow: rgba(0, 0, 0, 0.8) 2px 2px 20px;
+        }
+
+        .terminal .xterm-rows{
+            position: unset;
+        }
+        .modal-body{
+            min-height: 700px;
+            background: #2a99f4;
+        }
+
+
+
+{##}
+
+{#        .xterm.fullscreen{position:fixed;top:0;bottom:0;left:0;right:0;width:auto;height:auto;z-index:255}#}
+
+
+
+        .xterm.fullscreen{position:fixed;top:0;bottom:0;left:0;right:0;width:auto;height:auto;z-index:255}
+        {#        #term{#}
+        {#            width:100%;#}
+        {#        }#}
+
+    </style>
+
+{% endblock %}

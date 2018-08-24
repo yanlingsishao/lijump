@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source name="Sqlite (Xerial) - db.sqlite3" uuid="a0b2a678-b08c-4b30-8f0a-49a99286cca5">
+    <database-info product="SQLite" version="3.20.1" jdbc-version="2.1" driver-name="SQLite JDBC" driver-version="3.20.1.1"/>
+    <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed"/>
+  </data-source>
+  <data-source name="Sqlite (Xerial) - identifier.sqlite" uuid="c5a65ce0-5b57-446d-9c85-3463e3c62458">
+    <database-info product="SQLite" version="3.20.1" jdbc-version="2.1" driver-name="SQLite JDBC" driver-version="3.20.1.1"/>
+    <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed"/>
+    <database-model serializer="dbm" rdbms="SQLITE" format-version="2.6">
+      <schema id="1">
+        <visible>1</visible>
+      </schema>
+    </database-model>
+  </data-source>
+  <data-source name="Sqlite (Xerial) - db.sqlite3 [2]" uuid="b52ce307-65c8-4ac6-b75a-662ce8ca1a48">
+    <database-info product="SQLite" version="3.20.1" jdbc-version="2.1" driver-name="SQLite JDBC" driver-version="3.20.1.1"/>
+    <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed"/>
+    <database-model serializer="dbm" rdbms="SQLITE" format-version="2.6">
+      <schema id="1">
+        <visible>1</visible>
+      </schema>
+      <table id="2" parent="1" name="audit_accesslog"/>
+      <table id="3" parent="1" name="audit_account"/>
+      <table id="4" parent="1" name="audit_account_host_groups"/>
+      <table id="5" parent="1" name="audit_account_host_user_binds"/>
+      <table id="6" parent="1" name="audit_account_slb"/>
+      <table id="7" parent="1" name="audit_app"/>
+      <table id="8" parent="1" name="audit_auditlog"/>
+      <table id="9" parent="1" name="audit_environ"/>
+      <table id="10" parent="1" name="audit_environ_url"/>
+      <table id="11" parent="1" name="audit_environurl"/>
+      <table id="12" parent="1" name="audit_host"/>
+      <table id="13" parent="1" name="audit_hostgroup"/>
+      <table id="14" parent="1" name="audit_hostgroup_host_user_binds"/>
+      <table id="15" parent="1" name="audit_hostuser"/>
+      <table id="16" parent="1" name="audit_hostuserbind"/>
+      <table id="17" parent="1" name="audit_idc"/>
+      <table id="18" parent="1" name="audit_publishcmd"/>
+      <table id="19" parent="1" name="audit_sessionlog"/>
+      <table id="20" parent="1" name="audit_slb"/>
+      <table id="21" parent="1" name="audit_task"/>
+      <table id="22" parent="1" name="audit_tasklog"/>
+      <table id="23" parent="1" name="audit_token"/>
+      <table id="24" parent="1" name="auth_group"/>
+      <table id="25" parent="1" name="auth_group_permissions"/>
+      <table id="26" parent="1" name="auth_permission"/>
+      <table id="27" parent="1" name="auth_user"/>
+      <table id="28" parent="1" name="auth_user_groups"/>
+      <table id="29" parent="1" name="auth_user_user_permissions"/>
+      <table id="30" parent="1" name="celery_taskmeta"/>
+      <table id="31" parent="1" name="celery_tasksetmeta"/>
+      <table id="32" parent="1" name="django_admin_log"/>
+      <table id="33" parent="1" name="django_content_type"/>
+      <table id="34" parent="1" name="django_migrations"/>
+      <table id="35" parent="1" name="django_session"/>
+      <table id="36" parent="1" name="djcelery_crontabschedule"/>
+      <table id="37" parent="1" name="djcelery_intervalschedule"/>
+      <table id="38" parent="1" name="djcelery_periodictask"/>
+      <table id="39" parent="1" name="djcelery_periodictasks"/>
+      <table id="40" parent="1" name="djcelery_taskstate"/>
+      <table id="41" parent="1" name="djcelery_workerstate"/>
+      <table id="42" parent="1" name="navi_navi"/>
+      <table id="43" parent="1" name="sqlite_sequence"/>
+    </database-model>
+  </data-source>
+</component>

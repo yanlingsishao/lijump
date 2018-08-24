@@ -1,0 +1,3 @@
+mkdir /opt/jjj
+
+                        

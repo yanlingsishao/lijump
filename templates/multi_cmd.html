@@ -1,0 +1,83 @@
+{% extends 'index.html' %}
+<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+
+{% block content-container %}
+{#    {% csrf_token %}#}
+    <div id="page-title">
+        <h1 class="page-header text-overflow">主机列表</h1>
+
+        <!--Searchbox-->
+        <div class="searchbox">
+            <div class="input-group custom-search-form">
+                <input type="text" class="form-control" placeholder="Search..">
+                <span class="input-group-btn">
+                    <button class="text-muted" type="button"><i class="pli-magnifi-glass"></i></button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <!--End page title-->
+        <!--Breadcrumb-->
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <ol class="breadcrumb">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Library</a></li>
+        <li class="active">主机列表</li>
+    </ol>
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <!--End breadcrumb-->
+
+    <div id="page-content">
+        {% include 'components/hostgroups.html' %}
+        <div class="col-lg-9">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">命令</h3>
+                </div>
+                <div class="panel-body">
+                    <pre id="code" class="ace_editor" style="min-height:400px">
+                        <textarea class="ace_text-input" id="cmd">
+
+                        </textarea>
+                    </pre>
+                    <button onclick="PostTask('cmd')" class="btn btn-info pull-right">执行</button>
+                    <button  class="btn btn-danger ">终止</button>
+
+                </div>
+            </div>
+            {% include 'components/taskresult.html' %}
+        </div>
+
+    </div>
+
+
+
+
+{% block js %}
+    <script>
+    editor = ace.edit("#code");
+
+    //设置风格和语言（更多风格和语言，请到github上相应目录查看）
+    theme = "terminal"
+    language = "python"
+    editor.setTheme("ace/theme/" + theme);
+    editor.session.setMode("ace/mode/" + language);
+    //字体大小
+    editor.setFontSize(18);
+    //设置只读（true时只读，用于展示代码）
+    editor.setReadOnly(false);
+    //自动换行,设置为off关闭
+    editor.setOption("wrap", "free")
+    //启用提示菜单
+    ace.require("ace/ext/language_tools");
+    editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: true
+    });
+    </script>
+{% endblock %}
+{% include 'components/multitask_js.html' %}
+{% endblock %}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link href="/statics/plugins/chosen/chosen.css">
+    <link href="/statics/css/pace.min.css" rel="stylesheet">
+    <link href="/statics/css/nifty.min.css" rel="stylesheet">
+    <link href="/statics/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/statics/plugins/chosen/chosen.jquery.js"></script>
+    <script src="/statics/js/common.js"></script>
+    <script src="/statics/js/nifty.min.js"></script>
+    <script src="/statics/js/pace.min.js"></script>
+    <script src="/statics/js/jquery.min.js"></script>
+</head>
+<body>
+<div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content">
+
+    <div id="dialog">
+            <div class="box box-info">
+            <form class="form-horizontal" action="{% url 'update_environ' %}" method="POST">
+                      {% csrf_token %}
+                 <table id="update_slb" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>外部</th>
+                        <th>内部</th>
+                        <th>更新负载</th>
+                    </tr>
+                </thead>
+                <tbody id="env_slb">
+                        <tr>
+                            <td>
+                                <select id="demo-cs-multiselect" name="mu_url" multiple class="select">
+                                {% for url in env_url %}
+                                    <option value="{{ url.id }}">{{ url }}</option>
+                                {% endfor %}
+                                </select>
+{#                                <div class="chosen-container chosen-container-multi" style="width: 100%;" title="" id="demo_cs_multiselect_chosen">#}
+{#                                    <ul class="chosen-choices"><li class="search-field">#}
+{#                                        <input type="text" value="Choose a Country..." class="default" autocomplete="off" style="width: 145.563px;" tabindex="4">#}
+{#                                    </li>#}
+{#                                    </ul>#}
+{#                                    <div class="chosen-drop">#}
+{#                                        <ul class="chosen-results">#}
+{#                                            {% for url in env_url %}#}
+{#                                                <li class="result-selected" data-option-array-index="{{ url.id }}">#}
+{#                                                    <font style="vertical-align: inherit;">{{ url }}</font>#}
+{#                                                </li>#}
+{#                                            {% endfor %}#}
+{#                                        </ul>#}
+{#                                    </div>#}
+{#                                </div>#}
+                            </td>
+                            <td><select id="wai" name="wai" class="select">
+                            {% for env in all_env %}
+                                <option value="{{ env.id }}">{{ env }}</option>
+                            {% endfor %}
+                            </select></td>
+                            <td><select id="nei" name="nei" class="select">
+                            {% for env in all_env %}
+                                <option value="{{ env.id }}">{{ env }}</option>
+                            {% endfor %}
+                            </select></td>
+                            <td><input type="submit" value="确认"></td>
+                        </tr>
+                </tbody>
+            </table>
+            </form>
+            <div>
+                测试当前负载情况:
+                <a href="{% url 'test_lb_status' %}"><li style="width: 60pt" class="btn btn-primary" value="测试">测试</li></a>
+                <div class="lb_status">
+                    {% for k,v in url_dic.items %}
+                        <a>{{ k }}</a>:<pre>{{ v }}</pre>
+                    {% endfor %}
+
+                </div>
+            </div>
+            </div>
+    </div>
+    </section>
+
+  </div>
+{#回传参数至父层#}
+
+<link href="/statics/plugins/chosen/chosen.css">
+<link href="/statics/css/pace.min.css" rel="stylesheet">
+<link href="/statics/css/nifty.min.css" rel="stylesheet">
+<link href="/statics/css/bootstrap.min.css" rel="stylesheet">
+<script src="/statics/plugins/chosen/chosen.jquery.js"></script>
+<script src="/statics/js/common.js"></script>
+<script src="/statics/js/nifty.min.js"></script>
+<script src="/statics/js/pace.min.js"></script>
+<script src="/statics/js/jquery.min.js"></script>
+<script>
+
+     $(".chosen-select").chosen({no_results_text: "Oops, nothing found!"});
+{#        var index = parent.layer.getFrameIndex(window.name);#}
+{#        var success = {{ status }};#}
+{#        if ( success == '1' ) {#}
+{#            parent.$("#handle_status").val('1');#}
+{#            parent.layer.close(index);#}
+{#        } else if( success == '2' ) {#}
+{#            parent.$("#handle_status").val('2');#}
+{#            parent.layer.close(index);#}
+{#        }#}
+</script>
+</body>
+</html>
+

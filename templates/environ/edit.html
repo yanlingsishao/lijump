@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="content-wrapper">
+
+
+    <!-- Main content -->
+    <section class="content">
+
+<div id="dialog">
+        <div class="box box-info">
+            <!-- /.box-header -->
+            <!-- form start name,group_name,ex,url -->
+
+            <form class="form-horizontal" action="{% url 'save_environ' %}" method="POST">
+                      {% csrf_token %}
+                <div class="box-body">
+                <div class="form-group">
+                  <label for="env_name" class="col-sm-2 control-label">名称</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" name="name" value="{{ obj.name }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="env_group" class="col-sm-2 control-label">组名</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" name="group_name" value="{{ obj.group_name }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="env_url" class="col-sm-2 control-label">URL</label>
+
+                  <div class="col-sm-10">
+                      <select multiple   id="id_url" name="all_url" required="">
+                          {% for i in all_url %}
+                              {% if i in url %}
+                                  <option  onclick="test_onchange(this)" selected="selected" value="{{ i.id }}">{{ i }}</option>
+                              {% else %}
+                                  <option  onclick="test_onchange(this)" value="{{ i.id }}">{{ i }}</option>
+                              {% endif %}
+                          {% endfor %}
+                      </select>
+{#                    <input type="" class="form-control" name="url" value="{{ url }}">#}
+
+                  </div>
+                </div>
+                    <div class="form-group">
+                  <label for="env_ex" class="col-sm-2 control-label">参数</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" name="ex" value="{{ obj.ex }}">
+                  </div>
+                </div>
+                <input type="hidden" name="id" value="{{ obj.id }}">
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+                <button type="submit" class="btn btn-info pull-right">保存</button>
+              </div>
+              <!-- /.box-footer -->
+            </form>
+</div>
+    </div>
+
+    </section>
+
+  </div>
+{#回传参数至父层#}
+<script src="/statics/js/common.js"></script>
+<script>
+        var index = parent.layer.getFrameIndex(window.name);
+        var success = {{ status }};
+        if ( success == '1' ) {
+            parent.$("#handle_status").val('1');
+            parent.layer.close(index);
+
+        } else if( success == '2' ) {
+            parent.$("#handle_status").val('2');
+            parent.layer.close(index);
+
+        }
+
+
+
+</script>
+</body>
+</html>
+

@@ -1,0 +1,77 @@
+{% extends "index.html" %}
+{% block content-container %}
+    <div id="page-title">
+        <h1 class="page-header text-overflow">负载列表</h1>
+        <!--Searchbox-->
+        <div class="searchbox">
+            <div class="input-group custom-search-form">
+                <input type="text" class="form-control" placeholder="Search..">
+                <span class="input-group-btn">
+                    <button class="text-muted" type="button"><i class="pli-magnifi-glass"></i></button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <ol class="breadcrumb">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Library</a></li>
+        <li class="active">负载列表</li>
+    </ol>
+
+    <div id="page-content">
+        <div class="panel-body">
+                <ul class="list-group">
+                    {% for group in request.user.account.slb.all %}
+                        {% if group.method == "get" %}
+                        <li class="list-group-item" id="connectother" onclick="GetHostlist({{ group.id }},this)"><span
+                                class="badge badge-success">{{ group.host_user_binds.count }}</span>{{ group.method }}
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div id="page-body-right" class="panel col-lg-9">
+            <div class="panel-heading">
+                <h3 class="panel-title">负载列表</h3>
+            </div>
+            <button type="button" class="btn btn-success">选择设置</button>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table id="host_table" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>group</th>
+                            <th>Url</th>
+                            <th>Method</th>
+                            <th>Settings</th>
+                            <th>Update</th>
+                        </tr>
+                        </thead>
+                        <tbody id="slblist">
+                            {% for lb in slb %}
+                            <tr>
+                                <td>{{ lb.group_name }}</td>
+                                <td>{{ lb.url }}</td>
+                                <td>{{ lb.method }}</td>
+                                {% if lb.method == 'get' %}
+                                <td>{{ lb.url }}</td>
+                                {% else %}
+                                <td>{{ lb.url }}?W={{ lb.W }}&N={{ lb.N }}</td>
+                                {% endif %}
+                                <td></td>
+                            </tr>
+                            {% empty %}
+                                <tr>没有日志</tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

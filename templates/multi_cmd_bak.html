@@ -1,0 +1,301 @@
+{% extends 'index.html' %}
+{% block content-container %}
+    <div id="page-title">
+        <h1 class="page-header text-overflow">主机列表</h1>
+        <!--Searchbox-->
+        <div class="searchbox">
+            <div class="input-group custom-search-form">
+                <input type="text" class="form-control" placeholder="Search..">
+                <span class="input-group-btn">
+                    <button class="text-muted" type="button"><i class="pli-magnifi-glass"></i></button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <ol class="breadcrumb">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Library</a></li>
+        <li class="active">主机列表</li>
+    </ol>
+
+    <div id="page-content">
+        <div class="panel col-lg-3">
+            <div class="panel-heading">
+                <h3 class="panel-title">主机组<span id="selected_host"></span></h3>
+            </div>
+            <div class="panel-body">
+                <ul class="list-group" id="host_groups">
+                    {% for group in request.user.account.host_groups.all %}
+                        <li class="list-group-item"  ><span
+                                class="badge badge-success">{{ group.host_user_binds.count }}</span>
+                            <input type="checkbox" onclick="CheckAll(this)">
+                            <a onclick="DisplayHostlist(this)" style="cursor:pointer">{{ group.name }}</a>
+                        <ul class="hide">
+                            {% for bind_host in group.host_user_binds.all %}
+                                <li><input type="checkbox" onclick="showCheckedHostCount()" value="{{ bind_host.id }}">{{ bind_host.host.ip_addr }}
+                                </li>{% endfor %}
+                        </ul>
+                        </li>
+                    {% endfor %}
+                    <li class="list-group-item"  onclick="DisplayHostlist(this)">
+                        <span class="badge badge-success">{{ request.user.account.host_user_binds.count }}</span>
+                        <input type="checkbox" onclick="CheckAll(this)">
+                        <a onclick="DisplayHostlist(this)" style="cursor:pointer">未分组主机</a>
+                        <ul class="hide">
+                            {% for bind_host in request.user.account.host_user_binds.all %}
+                                <li><input type="checkbox" onclick="showCheckedHostCount()" value="{{ bind_host.id }}">{{ bind_host.host.ip_addr }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-9">
+                <div class="panel">
+                    <div class="lange">
+                        <div class="radiobox ">
+                            <input type="radio" id="person1" checked="checked" value="sh" name="radio" onclick="setLange(this)"  />
+                            <span class="text" id="sh">shell</span>
+                            <input type="radio" id="person2" onclick="setLange(this)" value="python" name="radio" />
+                            <span class="text" id="python">python</span>
+                        </div>
+                    </div>
+                    <div class="panel-heading">
+                        <h3 class="panel-title">命令</h3>
+                    </div>
+                    <div class="panel-body">
+                        <pre id="code" class="ace_editor" style="min-height:400px"><textarea class="ace_text-input" id="cmd" >#!/bin/bash
+
+anynowtime="date +'%Y-%m-%d %H:%M:%S'"
+NOW="echo [\`$anynowtime\`][PID:$$]"
+
+##### 可在脚本开始运行时调用，打印当时的时间戳及PID。
+function job_start
+{
+    echo "`eval $NOW` job_start"
+}
+
+##### 可在脚本执行成功的逻辑分支处调用，打印当时的时间戳及PID。
+function job_success
+{
+    MSG="$*"
+    echo "`eval $NOW` job_success:[$MSG]"
+    exit 0
+}
+
+##### 可在脚本执行失败的逻辑分支处调用，打印当时的时间戳及PID。
+function job_fail
+{
+    MSG="$*"
+    echo "`eval $NOW` job_fail:[$MSG]"
+    exit 1
+}
+
+job_start
+
+###### 可在此处开始编写您的脚本逻辑代码
+###### 作业平台中执行脚本成功和失败的标准只取决于脚本最后一条执行语句的返回值
+###### 如果返回值为0，则认为此脚本执行成功，如果非0，则认为脚本执行失败</textarea></pre>
+                        <button onclick="PostTask('cmd')" class="btn btn-info pull-right">执行</button>
+                        <button class="btn btn-danger ">紧急中止</button>
+                    </div>
+                </div>
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">任务执行结果</h3>
+                </div>
+                <div class="panel-body">
+                    <div  class="progress">
+                        <div id="task_progress" style="width: 0%;" class="progress-bar progress-bar-info">0%</div>
+                    </div>
+                    <div id="task_result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+
+        editor = ace.edit("code");
+
+        //设置风格和语言（更多风格和语言，请到github上相应目录查看）
+        theme = "terminal"
+        language = "python"
+        editor.setTheme("ace/theme/" + theme);
+        editor.session.setMode("ace/mode/" + language);
+        //字体大小
+        editor.setFontSize(18);
+        //设置只读（true时只读，用于展示代码）
+        editor.setReadOnly(false);
+        //自动换行,设置为off关闭
+        editor.setOption("wrap", "free")
+        //启用提示菜单
+        ace.require("ace/ext/language_tools");
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true
+        });
+
+        function setLange(self) {
+            var langeId = $(self).next().attr('id');
+            if (langeId == "sh"){
+                var editorValue="#!/bin/bash\n\n" +
+                        "anynowtime=\"date +'%Y-%m-%d %H:%M:%S'\"\n" +
+                        "NOW=\"echo [\\`$anynowtime\\`][PID:$$]\"\n\n" +
+                        "##### 可在脚本开始运行时调用，打印当时的时间戳及PID。\n" +
+                        "function job_start\n{\n" +
+                        "    echo \"`eval $NOW` job_start\"\n}\n" +
+                        "##### 可在脚本执行成功的逻辑分支处调用，打印当时的时间戳及PID。 \n" +
+                        "function job_success\n{\n" +
+                        "    MSG=\"$*\"\n" +
+                        "    echo \"`eval $NOW` job_success:[$MSG]\"\n" +
+                        "    exit 0\n}\n\n" +
+                        "##### 可在脚本执行失败的逻辑分支处调用，打印当时的时间戳及PID。\n" +
+                        "function job_fail\n{\n" +
+                        "    MSG=\"$*\"\n" +
+                        "    echo \"`eval $NOW` job_fail:[$MSG]\"\n" +
+                        "    exit 1\n}\n\n" +
+                        "job_start\n" +
+                        "###### 可在此处开始编写您的脚本逻辑代码\n"+
+                        "###### 作业平台中执行脚本成功和失败的标准只取决于脚本最后一条执行语句的返回值\n"+
+                        "###### 如果返回值为0，则认为此脚本执行成功，如果非0，则认为脚本执行失败\n";
+            }else {
+                var editorValue="#!/usr/bin/env python\n" +
+                        "# -*- coding: utf8 -*-\n\n" +
+                        "import datetime\nimport os\nimport sys\n\n" +
+                        "def _now(format=\"%Y-%m-%d %H:%M:%S\"):\n" +
+                        "    return datetime.datetime.now().strftime(format)\n\n" +
+                        "##### 可在脚本开始运行时调用，打印当时的时间戳及PID。\n" +
+                        "def job_start():\n" +
+                        "    print \"[%s][PID:%s] job_start\" % (_now(), os.getpid())\n" +
+                        "##### 可在脚本执行成功的逻辑分支处调用，打印当时的时间戳及PID。\n" +
+                        "def job_success(msg):\n" +
+                        "    print \"[%s][PID:%s] job_success:[%s]\" % (_now(), os.getpid(), msg)\n" +
+                        "    sys.exit(0)\n\n" +
+                        "##### 可在脚本执行失败的逻辑分支处调用，打印当时的时间戳及PID。\n" +
+                        "def job_fail(msg):\n" +
+                        "    print \"[%s][PID:%s] job_fail:[%s]\" % (_now(), os.getpid(), msg)\n" +
+                        "    sys.exit(1)\n\n" +
+                        "if __name__ == '__main__':\n\n" +
+                        "    job_start()\n\n" +
+                        "###### 可在此处开始编写您的脚本逻辑代码\n" +
+                        "###### iJobs中执行脚本成功和失败的标准只取决于脚本最后一条执行语句的返回值\n" +
+                        "###### 如果返回值为0，则认为此脚本执行成功，如果非0，则认为脚本执行失败"
+            }
+            editor.setValue(editorValue);
+            editor.session.setMode("ace/mode/" + langeId);
+        }
+
+        function DisplayHostlist(self){
+            $(self).next().toggleClass("hide");
+        }
+
+        function CheckAll(self){
+            $(self).parent().find("ul :checkbox").prop("checked",$(self).prop("checked"));
+{#            var selected_host_count = $("#host_groups ul").find(":checked").length#}
+            showCheckedHostCount()
+        }
+
+
+        function showCheckedHostCount() {
+            var selected_host_count = $("#host_groups ul").find(":checked").length;
+            $("#selected_host").text("("+selected_host_count+")");
+            return selected_host_count
+        }
+        
+        function GetTaskResult(task_id,task_timeout) {
+            $.getJSON("{% url 'get_task_result' %}",{"task_id":task_id},function(callback){
+                var result_ele = '';
+                var all_task_finished = true;
+                var finished_task_count = 0;
+                $.each(callback,function (index,i) {
+                    var p_ele = "<p>" + i.host_user_bind__host__hostname + "(" + i.host_user_bind__host__ip_addr + ") ---"+
+                        i.status + "</p>";
+                    var res_ele = "<pre>" + i.result + "</pre>";
+                    var single_result = p_ele + res_ele;
+
+                    result_ele += single_result;
+                    if ( i.status == 3){
+                    all_task_finished = false;
+                    }else {
+                    //task not finished yet
+                    finished_task_count += 1;
+                    }
+
+                });
+                 if (task_timeout_counter < task_timeout){
+                // not timed out yet
+                    task_timeout_counter += 2;
+
+                }else {
+                     all_task_finished = true;
+                     $.niftyNoty({
+                        type: 'danger',
+                        container : '#task_result_panel',
+                        html : '<h4 class="alert-title">Task timed out!</h4><p class="alert-message">The task has timed out!</p><div class="mar-top"><button type="button" class="btn btn-info" data-dismiss="noty">Close this notification</button></div>',
+                        closeBtn : false
+                    });
+                 }
+                if ( all_task_finished){
+                clearInterval(result_timer);
+                console.log("timmer canceled....")
+                    }
+
+                $("#task_result").html(result_ele);
+
+                var total_finished_percent = parseInt(finished_task_count / callback.length * 100 );
+                $("#task_progress").text(total_finished_percent+"%");
+                $("#task_progress").css("width",total_finished_percent+"%");
+
+
+            })
+        }
+        
+        function PostTask(task_type){
+
+            var selected_host_ids = [];
+            var selected_host_eles = $("#host_groups ul").find(":checked");
+            var langeId = $("input[name='radio']:checked").val();
+
+            console.log(langeId);
+            $.each(selected_host_eles,function (index,ele) {
+                selected_host_ids.push($(ele).val())
+            });
+            if (selected_host_ids.length == 0){
+                alert("主机未选择");
+                return false
+            }
+            var cmd_text = editor.getValue();
+{#            var cmd_text = $.trim($("#cmd").val());#}
+            if (cmd_text.length == 0){
+                alert("未输入命令");
+                return false
+            }
+
+            var task_data = {
+                "lange_id":langeId,
+                "task_type":task_type,
+                "selected_host_ids":selected_host_ids,
+                "cmd":cmd_text
+            };
+
+
+            $.post("{% url 'multitask' %}",{"csrfmiddlewaretoken": "{{ csrf_token }}","task_data":JSON.stringify(task_data)},
+                function(callback){
+                    var callback = JSON.parse(callback);
+                    GetTaskResult(callback.task_id,callback.timeout);
+                    task_timeout_counter = 0;
+                    result_timer = setInterval(function () {
+                        GetTaskResult(callback.task_id,callback.timeout)
+                    },2000)
+
+
+                });
+        }
+
+
+    </script>
+{% endblock %}
